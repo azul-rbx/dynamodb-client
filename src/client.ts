@@ -16,7 +16,7 @@ export type ClientConfig = {
 	endpoint_url: string;
 };
 
-type AttributeValue = {
+export type AttributeValue = {
 	B?: string;
 	BOOL?: boolean;
 	BS?: string[];
@@ -56,9 +56,9 @@ type ConsumedCapacity = {
 }
 
 type GetItemArgs = {
-	AttributesToGet: string[];
+	AttributesToGet?: string[];
 	ConsistentRead?: boolean;
-	ExpressionAttributeNames: { [key: string]: string };
+	ExpressionAttributeNames?: { [key: string]: string };
 	Key: {
 		[key: string]: AttributeValue;
 	};
@@ -140,7 +140,7 @@ type UpdateItemResult = {
 };
 
 type DescribeTableArgs = {
-  Table: string
+  TableName: string
 };
 
 type DescribeTableResult = {
@@ -172,13 +172,13 @@ type KeySchemaDefinition = {
   KeyType: "HASH" | "RANGE",
 }
 
-type CreateTableArgs = {
+export type CreateTableArgs = {
   AttributeDefinitions: AttributeDefinition[],
   BillingMode: string,
-  DeletionProtectionEnabled: boolean,
-  GlobalSecondaryIndexes: GlobalSecondaryIndex[],
+  DeletionProtectionEnabled?: boolean,
+  GlobalSecondaryIndexes?: GlobalSecondaryIndex[],
   KeySchema: KeySchemaDefinition[],
-  LocalSecondaryIndexes: {
+  LocalSecondaryIndexes?: {
     IndexName: string,
     KeySchema: KeySchemaDefinition[],
     Projection: {
@@ -186,18 +186,18 @@ type CreateTableArgs = {
       ProjectionType: string,
     }
   },
-  ProvisionedThroughput: {
+  ProvisionedThroughput?: {
     ReadCapacityUnits: number,
     WriteCapacityUnits: number
   },
-  SSESpecification: {
+  SSESpecification?: {
     Enabled: boolean,
     KMSMasterKeyId: string,
     SSEType: string,
   },
-  TableClass: string,
+  TableClass?: string,
   TableName: string,
-  Tags: { Key: string, Value: string }[]
+  Tags?: { Key: string, Value: string }[]
 };
 
 type TableDescription = {

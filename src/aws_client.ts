@@ -85,13 +85,13 @@ export class AwsClient {
     this.sessionToken = sessionToken;
     this.service = service;
     this.region = region;
-    this.cache = cache || new Map();
+    this.cache = cache ?? new Map();
     this.retries = retries !== undefined ? retries : 10; // Up to 25.6 secs
-    this.initRetryMs = initRetryMs || 50;
+    this.initRetryMs = initRetryMs ?? 50;
   }
 
-  sign(input: RequestInit, init: AwsRequestInit): RequestAsyncRequest {
-    const signer = new AwsV4Signer({ ...input, ...init.aws });
+  sign(input: RequestInit, init?: AwsRequestInit): RequestAsyncRequest {
+    const signer = new AwsV4Signer({ ...input, ...(init ? init.aws : this), });
     const signed = signer.sign();
 
     let url = `${input.host}${signed.path}`;
@@ -110,6 +110,26 @@ export class AwsClient {
       Headers: signed.headers,
       Body: signed.body,
     };
+  }
+
+  fetch(input: RequestInit, init?: AwsRequestInit) {
+    for (let i = 0; i <= this.retries; i++) {
+      const request = this.sign(input, init);
+      const [success, result] = pcall(() => {
+        return HttpService.RequestAsync(request)
+      });
+      if (success) {
+        assert(result);
+        if (i === this.retries) {
+          return result;
+        }
+        if (result.StatusCode < 500 && result.StatusCode !== 429) {
+          return result;
+        }
+        task.wait(math.random() * this.initRetryMs * math.pow(2, i));
+      }
+    }
+    error("Requests did not succeed -- something may be wrong");
   }
 
   // TODO: have an exponential backoff request handler here, in the client itself
@@ -208,18 +228,19 @@ export class AwsV4Signer {
       error("secretAccessKey is a required option");
     }
 
-    this.method = method || (body ? "POST" : "GET");
+    this.method = method ?? (body ? "POST" : "GET");
     this.path = path;
     this.query = convertTableToMap(query);
     this.headers = convertTableToMap(headers);
-    this.body = body || "";
+    this.body = body ?? "";
     this.accessKeyId = accessKeyId!;
     this.secretAccessKey = secretAccessKey!;
     this.sessionToken = sessionToken;
-    this.service = service || "";
-    this.region = region || "us-east-1";
-    this.cache = cache || new Map();
-    this.datetime = datetime || requestTime();
+    this.service = service ?? "";
+    this.region = region ?? "us-east-1";
+    this.cache = cache ?? new Map();
+    // eslint-disable-next-line
+    this.datetime = datetime ?? requestTime();
     this.signQuery = signQuery;
     this.appendSessionToken =
       appendSessionToken || this.service === "iotdevicegateway";
@@ -265,7 +286,7 @@ export class AwsV4Signer {
     // https://fetch.spec.whatwg.org/#concept-header-value-normalize
     this.signableHeaders.sort();
     this.canonicalHeaders = this.signableHeaders
-      .map((header) => header + ":" + (this.headers.get(header) || ""))
+      .map((header) => header + ":" + (this.headers.get(header) ?? ""))
       .join("\n");
 
     this.credentialString = [

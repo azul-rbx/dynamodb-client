@@ -45,19 +45,11 @@ export class DynamoDBClient {
       body: HttpService.JSONEncode(args)
     }
 
-    const signedRequest = this.client.sign(request, { aws: { ...this.client }})
-    print(signedRequest)
-
-    const [success, result] = pcall(() => {
-      return HttpService.RequestAsync(signedRequest)
-    });
-    if (success) {
-      assert(result);
-      if (between(result.StatusCode, 200, 299)) {
-        return HttpService.JSONDecode(result.Body)
-      } else {
-        error(`DynamoDB request failed with status code ${result.StatusCode} and body ${result.Body}`)
-      }
+    const result = this.client.fetch(request);
+    if (between(result.StatusCode, 200, 299)) {
+      return HttpService.JSONDecode(result.Body)
+    } else {
+      error(`DynamoDB request failed with status code ${result.StatusCode} and body ${result.Body}`)
     }
   }  
 }

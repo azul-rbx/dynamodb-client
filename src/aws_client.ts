@@ -349,7 +349,6 @@ export class AwsV4Signer {
   }
 
   stringToSign() {
-    print(this.canonicalString());
     return [
       "AWS4-HMAC-SHA256",
       this.datetime[0],

@@ -1,0 +1,4 @@
+*.rbxl
+node_modules
+out
+include

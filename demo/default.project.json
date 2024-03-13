@@ -1,0 +1,31 @@
+{
+  "name": "run-in-roblox demo",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+			"$className": "ReplicatedStorage",
+			"Packages": {
+				"$className": "Folder",
+				"DynamoDB": {
+					"$path": "../out",
+					"node_modules": {
+						"$className": "Folder",
+						"@rbxts": {
+							"$path": "../node_modules/@rbxts"
+						}
+					}
+				},
+				"rbxts": {
+					"$className": "Folder",
+					"$path": "../include"
+				}
+			}
+		},
+    "ServerScriptService": {
+			"$className": "ServerScriptService",
+			"Server": {
+				"$path": "Server.server.lua"
+			}
+		}
+  }
+}

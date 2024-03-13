@@ -5,3 +5,4 @@
 
 export {DynamoDBClient} from "./client"
 export {DataStore} from "./data_store"
+export {OrderedDataStore} from "./ordered_data_store"

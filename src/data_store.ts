@@ -1,6 +1,6 @@
 import { AttributeValue, CreateTableArgs, DynamoDBClient } from "./client";
 
-const createTableIfNotExists = (client: DynamoDBClient, args: CreateTableArgs) => {
+export const createTableIfNotExists = (client: DynamoDBClient, args: CreateTableArgs) => {
 	const [success, _] = pcall(() => {
 		return client.DescribeTable({
 			TableName: args.TableName,
@@ -20,7 +20,7 @@ type DynamoCoercibleAttributes = string |
   { [key: string]: DynamoCoercibleAttributes } |
   DynamoCoercibleAttributes[]
 
-function toDynamoAttribute<S extends DynamoCoercibleAttributes | undefined>(input: S): AttributeValue {
+export function toDynamoAttribute<S extends DynamoCoercibleAttributes | undefined>(input: S): AttributeValue {
   switch (type(input)) {
     case "boolean": {
       return {
@@ -77,7 +77,7 @@ type AttributeValueMapping<S extends AttributeValue> =
   S["NULL"] extends true ? undefined :
   never;
 
-function fromDynamoAttribute(input: AttributeValue): AttributeValueMapping<typeof input> {
+export function fromDynamoAttribute(input: AttributeValue): AttributeValueMapping<typeof input> {
   if (input.S !== undefined) {
     return input.S as AttributeValueMapping<typeof input>;
   }

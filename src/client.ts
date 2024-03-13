@@ -153,10 +153,10 @@ type GlobalSecondaryIndex = {
   IndexName: string;
   KeySchema: KeySchemaDefinition[];
   Projection: {
-    NonKeyAttributes: string[],
+    NonKeyAttributes?: string[],
     ProjectionType: string,
   },
-  ProvisionedThroughput: {
+  ProvisionedThroughput?: {
     ReadCapacityUnits: number,
     WriteCapacityUnits: number,
   }
@@ -227,6 +227,77 @@ type TableDescription = {
 
 type CreateTableResult = {
   TableDescription: TableDescription
+};
+
+type DeleteItemArgs = {
+  Key: { [key: string]: AttributeValue }
+  TableName: string
+};
+
+type DeleteItemResult = {
+
+};
+
+type ScanArgs = {
+  AttributesToGet?: string[],
+  ConditionalOperator?: string,
+  ConsistentRead?: boolean,
+  ExclusiveStartKey?: { [key: string]: AttributeValue },
+  ExpressionAttributeNames?: { [key: string]: string },
+  ExpressionAttributeValues?: { [key: string]: AttributeValue },
+  FilterExpression?: string,
+  IndexName?: string,
+  Limit?: number,
+  ProjectionExpression?: string,
+  ReturnConsumedCapacity?: string,
+  ScanFilter?: { [key: string]: {
+    AttributeValueList: { [key: string]: AttributeValue }[],
+    ComparisonOperator: string,
+  }}
+  Segment?: number,
+  Select?: string,
+  TableName: string,
+  TotalSegments?: number
+};
+
+type ScanResult = {
+  Count: number,
+  Items: {[key: string]: AttributeValue}[],
+  LastEvaluatedKey: {[key: string]: AttributeValue},
+  ScannedCount: number
+};
+
+type QueryArgs = {
+  AttributesToGet?: string[],
+  ConditionalOperator?: string,
+  ConsistentRead?: boolean,
+  ExclusiveStartKey?: { [key: string]: AttributeValue },
+  ExpressionAttributeNames?: { [key: string]: string },
+  ExpressionAttributeValues?: { [key: string]: AttributeValue },
+  FilterExpression?: string,
+  IndexName?: string,
+  KeyConditionExpression?: string,
+  KeyConditions?: { [key: string]: {
+    AttributeValueList: { [key: string]: AttributeValue }[],
+    ComparisonOperator: string,
+  }},
+  Limit?: number,
+  ProjectionExpression?: string,
+  ReturnConsumedCapacity?: string,
+  QueryFilter?: { [key: string]: {
+    AttributeValueList: { [key: string]: AttributeValue }[],
+    ComparisonOperator: string,
+  }},
+  ScanIndexForward?: boolean,
+  Select?: string,
+  TableName: string,
+};
+
+type QueryResult = {
+  Count: number,
+  Items: {[key: string]: AttributeValue}[],
+  LastEvaluatedKey: {[key: string]: AttributeValue},
+  ScannedCount: number
 };
 
 function between(num: number, min: number, max: number) {
@@ -331,4 +402,49 @@ export class DynamoDBClient {
 
 		return this.request(request) as PutItemResult;
 	}
+
+  DeleteItem(args: DeleteItemArgs): DeleteItemResult {
+    const request = {
+			method: "POST",
+			host: this.config.endpoint_url,
+			path: "/",
+			headers: {
+				"x-amz-target": "DynamoDB_20120810.DeleteItem",
+				"Content-Type": "application/x-amz-json-1.0",
+			},
+			body: HttpService.JSONEncode(args),
+		};
+
+		return this.request(request) as DeleteItemResult;
+  }
+
+  Scan(args: ScanArgs): ScanResult {
+    const request = {
+			method: "POST",
+			host: this.config.endpoint_url,
+			path: "/",
+			headers: {
+				"x-amz-target": "DynamoDB_20120810.Scan",
+				"Content-Type": "application/x-amz-json-1.0",
+			},
+			body: HttpService.JSONEncode(args),
+		};
+
+		return this.request(request) as ScanResult;
+  }
+
+  Query(args: QueryArgs): QueryResult {
+    const request = {
+			method: "POST",
+			host: this.config.endpoint_url,
+			path: "/",
+			headers: {
+				"x-amz-target": "DynamoDB_20120810.Query",
+				"Content-Type": "application/x-amz-json-1.0",
+			},
+			body: HttpService.JSONEncode(args),
+		};
+
+		return this.request(request) as QueryResult;
+  }
 }

@@ -48,13 +48,13 @@ type AwsRequestInit = {
   };
 };
 
-type RequestInit = {
+export type RequestInit = {
   method: string;
   host: string;
   path: string;
-  query: Map<string, string> | Record<string, string>;
-  headers: Map<string, string> | Record<string, string>;
-  body: string;
+  query?: Map<string, string> | Record<string, string>;
+  headers?: Map<string, string> | Record<string, string>;
+  body?: string;
 };
 
 export class AwsClient {
@@ -230,8 +230,8 @@ export class AwsV4Signer {
 
     this.method = method ?? (body ? "POST" : "GET");
     this.path = path;
-    this.query = convertTableToMap(query);
-    this.headers = convertTableToMap(headers);
+    this.query = convertTableToMap(query ?? {});
+    this.headers = convertTableToMap(headers ?? {});
     this.body = body ?? "";
     this.accessKeyId = accessKeyId!;
     this.secretAccessKey = secretAccessKey!;
